@@ -1,5 +1,7 @@
 package com.example.textureviewcamera;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.SurfaceTexture;
@@ -49,9 +51,23 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
 
         mCamera = Camera.open(0);
+        Log.e("Log", "mCamera = " + mCamera);
+        
         try {
-            Log.e("Log", "mCamera = " + mCamera);
             mCamera.setPreviewTexture(surface);
+            
+            Camera.Parameters params = mCamera.getParameters();
+            List<String> focusMode = params.getSupportedFocusModes();
+
+            if(0 != focusMode.size()) {
+                for(String mode :focusMode) {
+                    if(mode.equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                        params.setFocusMode(mode);
+                        Log.e("Log","Auto Focus");
+                    }
+                }
+            }
+            mCamera.setParameters(params);
             mCamera.setDisplayOrientation(90);
             mCamera.startPreview();
         } catch (Exception e) {
